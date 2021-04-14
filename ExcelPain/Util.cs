@@ -1,10 +1,32 @@
 ﻿using System;
+using System.Collections.Generic;
 using System.Drawing;
 
 namespace ExcelPain
 {
     public static class Util
     {
+        static Random rnd = new Random();
+
+        /// <summary>
+        /// shuffle a list
+        /// based on https://stackoverflow.com/a/1262619
+        /// </summary>
+        /// <typeparam name="T"></typeparam>
+        /// <param name="list">the lsit to shuffle</param>
+        public static void Shuffle<T>(this List<T> list)
+        {
+            int n = list.Count;
+            while (n > 1)
+            {
+                n--;
+                int k = rnd.Next(n + 1);
+                T x = list[k];
+                list[k] = list[n];
+                list[n] = x;
+            }
+        }
+
         /// <summary>
         /// resize a bitmap. the original bitmap is disposed
         /// </summary>

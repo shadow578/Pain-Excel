@@ -54,7 +54,18 @@ namespace ExcelPain
         /// <param name="of">the image</param>
         /// <param name="primary">primary color</param>
         /// <param name="secondary">secondary color</param>
-        public Frame(Bitmap of, Color primary, Color secondary)
+        public Frame(Bitmap of, Color primary, Color secondary) : this(of, null, primary, secondary)
+        {
+        }
+
+        /// <summary>
+        /// init a new frame
+        /// </summary>
+        /// <param name="of">the image</param>
+        /// <param name="diff">previous image. only differences are added</param>
+        /// <param name="primary">primary color</param>
+        /// <param name="secondary">secondary color</param>
+        public Frame(Bitmap of, Bitmap diff, Color primary, Color secondary)
         {
             width = of.Width;
             height = of.Height;
@@ -70,9 +81,23 @@ namespace ExcelPain
                     Color c = of.GetPixel(x, y);
                     float deltaPrimary = c.DeltaETo(primary);
                     float deltaSecondary = c.DeltaETo(secondary);
+                    State state = (deltaPrimary < deltaSecondary) ? State.Primary : State.Secondary;
+
+                    // get deltaE to primary and secondary for previous frame
+                    if (diff != null)
+                    {
+                        Color cd = diff.GetPixel(x, y);
+                        float deltaPrimaryDiff = cd.DeltaETo(primary);
+                        float deltaSecondaryDiff = cd.DeltaETo(secondary);
+                        State stateDiff = (deltaPrimaryDiff < deltaSecondaryDiff) ? State.Primary : State.Secondary;
+
+                        // set as already drawn if equal state
+                        if (state == stateDiff)
+                            state = State.Drawn;
+                    }
 
                     // set state in frame
-                    frame[x, y] = (deltaPrimary < deltaSecondary) ? State.Primary : State.Secondary;
+                    frame[x, y] = state;
                 }
         }
 
@@ -161,7 +186,7 @@ namespace ExcelPain
         {
             int x = startX + 1;
             int y = startY + 1;
-            Console.WriteLine($"i: {startX} j: {startY}");
+            //Console.WriteLine($"i: {startX} j: {startY}");
             frame[startX, startY] = State.Drawn;
             bool xLimitHit = false;
             bool yLimitHit = false;
@@ -214,7 +239,7 @@ namespace ExcelPain
                 if (!yLimitHit)
                     y++;
 
-                Console.WriteLine($"X: {x}  Y: {y}");
+                //Console.WriteLine($"X: {x}  Y: {y}");
             }
 
             // calc width and height
@@ -228,7 +253,7 @@ namespace ExcelPain
                         frame[xx, yy] = State.Drawn;
 
             Console.WriteLine($"R: X: {startX}  Y: {startY}  W: {w}  H: {h}   ({w + startX} / {h + startY})");
-            Console.WriteLine("----------");
+            //Console.WriteLine("----------");
 
             //if (w <= 0 || h <= 0)
             //    return null;
