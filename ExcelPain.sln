@@ -1,0 +1,25 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio Version 16
+VisualStudioVersion = 16.0.31129.286
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ExcelPain", "ExcelPain\ExcelPain.csproj", "{9C03BF18-C117-43C3-A88C-68351843EC32}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{9C03BF18-C117-43C3-A88C-68351843EC32}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{9C03BF18-C117-43C3-A88C-68351843EC32}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{9C03BF18-C117-43C3-A88C-68351843EC32}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{9C03BF18-C117-43C3-A88C-68351843EC32}.Release|Any CPU.Build.0 = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {9B80129F-08CB-4311-B3A6-BA5FBF7E2080}
+	EndGlobalSection
+EndGlobal
