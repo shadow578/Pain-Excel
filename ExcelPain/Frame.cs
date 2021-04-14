@@ -117,13 +117,18 @@ namespace ExcelPain
                         s++;
 
             // if we have more secondary than primary, swap the colors
-            if (s > p)
+            if (s < p)
+            {
+                Color t = primaryRGB;
+                primaryRGB = secondaryRGB;
+                secondaryRGB = t;
                 for (int x = 0; x < width; x++)
                     for (int y = 0; y < height; y++)
                         if (frame[x, y] == State.Primary)
                             frame[x, y] = State.Secondary;
                         else if (frame[x, y] == State.Secondary)
                             frame[x, y] = State.Primary;
+            }
 
             return this;
         }
@@ -252,7 +257,7 @@ namespace ExcelPain
                     if (xx < width && yy < height)
                         frame[xx, yy] = State.Drawn;
 
-            Console.WriteLine($"R: X: {startX}  Y: {startY}  W: {w}  H: {h}   ({w + startX} / {h + startY})");
+            //Console.WriteLine($"R: X: {startX}  Y: {startY}  W: {w}  H: {h}   ({w + startX} / {h + startY})");
             //Console.WriteLine("----------");
 
             //if (w <= 0 || h <= 0)

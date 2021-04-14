@@ -9,10 +9,10 @@ namespace ExcelPain
     public class App
     {
         #region Options
-        static int renderW = 128;
+        static int renderW = 256;
         static int renderH = renderW;
         static string vbaFrameSleep = "0.1";
-        static int frameLimit = 400;
+        static int maxFramesPerModule = 100;
         static bool shuffleRects = true;
         #endregion
 
@@ -23,24 +23,41 @@ namespace ExcelPain
             string framesDir = Console.ReadLine();
 
             // get output file (txt)
-            Console.WriteLine("Enter output file for VBA code (.txt): ");
+            Console.WriteLine("Enter output file for VBA code (.txt appended): ");
             string outFile = Console.ReadLine();
 
+            // render into multiple modules
+            for (int mod = 0; RenderVBA(framesDir, outFile, mod) >= maxFramesPerModule; mod++)
+                Console.WriteLine($"Module {mod}");
+        }
+
+        static int RenderVBA(string framesDir, string outFile, int moduleNo)
+        {
             // prepare vba
             StringBuilder vbaBody = new StringBuilder();
             StringBuilder mainFn = new StringBuilder();
             mainFn.AppendLine("Sub DrawMain()");
 
             // enumerate all pngs
+            int skip = maxFramesPerModule * moduleNo;
             int frameNo = 0;
+            int frameCount = 0;
             foreach (string img in Directory.EnumerateFiles(framesDir, "*.png", SearchOption.TopDirectoryOnly))
                 using (Bitmap bmp = new Bitmap(img).Resize(renderW, renderH))
                 {
                     // load bitmap
-                    Console.WriteLine($"Prepare frame {frameNo}...");
+                    Console.Write($"Prepare frame {frameNo}... ");
+
+                    // skip frames
+                    if (frameNo < skip)
+                    {
+                        Console.WriteLine("skip");
+                        frameNo++;
+                        continue;
+                    }
 
                     // abort after limit
-                    if (frameLimit != -1 && frameNo >= frameLimit)
+                    if (maxFramesPerModule != -1 && frameNo >= (skip + maxFramesPerModule))
                     {
                         Console.WriteLine("last frame!");
                         break;
@@ -57,6 +74,7 @@ namespace ExcelPain
 
                     //add sleep statement
                     mainFn.AppendLine($"Sleep {vbaFrameSleep}");
+                    frameCount++;
                 }
 
             // finish and write vba
@@ -64,8 +82,9 @@ namespace ExcelPain
             vbaBody.AppendLine(mainFn.ToString());
             vbaBody.AppendLine(ExcelSleepFn());
 
-            Console.WriteLine($"writing to {outFile}...");
-            File.WriteAllText(outFile, vbaBody.ToString());
+            Console.WriteLine($"writing to {outFile}_m{moduleNo}.txt...");
+            File.WriteAllText($"{outFile}_m{moduleNo}.txt", vbaBody.ToString());
+            return frameCount;
         }
 
         /// <summary>
@@ -85,8 +104,9 @@ namespace ExcelPain
             Color secondary = frame.GetSecondary();
 
             // dont write function if no rects
-            if (rects.Count <= 0)
-                return "";
+            Console.WriteLine($" {rects.Count} rects");
+            //if (rects.Count <= 0)
+            //    return "";
 
             // shuffle rects
             if (shuffleRects)
@@ -97,7 +117,7 @@ namespace ExcelPain
 
             // prepare function for this frame
             StringBuilder frameFn = new StringBuilder();
-            frameFn.AppendLine($"Sub {fnName}()");
+            frameFn.AppendLine($"Private Sub {fnName}()");
             frameFn.AppendLine(@$"Debug.Print(""{fnName}"")");
 
             // clear frame first
@@ -120,7 +140,7 @@ namespace ExcelPain
         static string ExcelSleepFn()
         {
             return @"
-Sub Sleep(vSeconds As Variant)
+Private Sub Sleep(vSeconds As Variant)
     Dim t0 As Single, t1 As Single
     t0 = Timer
     Do
